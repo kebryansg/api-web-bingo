@@ -1,30 +1,15 @@
-#FROM node:gallium-alpine3.16
+FROM node:gallium-alpine3.16
 
-FROM node:gallium-alpine3.16 As development
+WORKDIR /app
 
-WORKDIR /usr/src/app
+COPY package.json .
 
-COPY package*.json ./
-
-RUN npm install --only=development
+RUN yarn install
 
 COPY . .
 
-RUN npm run build
+RUN yarn build
 
-FROM node:gallium-alpine3.16 as production
+EXPOSE 3000
+CMD [ "yarn", "start:prod" ]
 
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-RUN npm install --only=production
-
-COPY . .
-
-COPY --from=development /usr/src/app/dist ./dist
-
-CMD ["node", "dist/main"]
