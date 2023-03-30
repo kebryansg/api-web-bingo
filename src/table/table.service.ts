@@ -12,20 +12,23 @@ export class TableService {
               private tableRepository: Repository<Table>) {
   }
 
-  create(createTableDto: CreateTableDto) {
-    //"This action adds a new table";
-    return this.tableRepository.save(createTableDto);
-  }
-
   findAll() {
-    return this.tableRepository.find();
+    return this.tableRepository.find()
+      .then(tables =>
+        tables.map(mapItem)
+      );
   }
 
   findOne(id: number) {
     // `This action returns a #${id} table`;
-    return this.tableRepository.findBy({
+    return this.tableRepository.findOneBy({
       id
-    });
+    }).then(mapItem);
+  }
+
+  create(createTableDto: CreateTableDto) {
+    //"This action adds a new table";
+    return this.tableRepository.save(createTableDto);
   }
 
   update(id: number, updateTableDto: UpdateTableDto) {
@@ -38,3 +41,8 @@ export class TableService {
     return this.tableRepository.delete(id);
   }
 }
+
+const mapItem = (table: Table) => ({
+  ...table,
+  data: JSON.parse(table.data)
+});
